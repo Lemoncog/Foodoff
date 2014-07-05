@@ -3,7 +3,9 @@ define(function(require, exports, module) {
     var Engine = require('famous/core/Engine');
     var Modifier = require('famous/core/Modifier');
     var Transform = require('famous/core/Transform');
+    var Surface = require('famous/core/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
+
 
     imageWidth = 200;
 
@@ -29,12 +31,33 @@ define(function(require, exports, module) {
         })
     };
 
+    var centerModifier = function() {
+        return new Modifier({
+            size : [100, 100],
+            origin: [0.5, 0.5]
+        })
+    };
+
     var positionMod = function(x,y,z) {
         return new Modifier({
             transform : Transform.translate(x, y, z)
         });
     };
 
-    mainContext.add(positionMod(-imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('spinach.svg'));
-    mainContext.add(positionMod(imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('lettuce.svg'));
+    var buildText = function(text) {
+        return new Surface({
+            content: text,
+            properties: {
+                color : 'black',
+                textAlign: 'center'
+            }
+        });
+    };
+
+    var vsSurface = mainContext.add(centerModifier());
+
+    vsSurface.add(positionMod(-imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('spinach.svg'));
+    vsSurface.add(positionMod(imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('lettuce.svg'));
+
+    vsSurface.add(positionMod(0,0,0)).add(buildText('<h1>Vs</h1>'));
 });
