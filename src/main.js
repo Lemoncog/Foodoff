@@ -5,23 +5,36 @@ define(function(require, exports, module) {
     var Transform = require('famous/core/Transform');
     var ImageSurface = require('famous/surfaces/ImageSurface');
 
+    imageWidth = 200;
+
     // create the main context
     var mainContext = Engine.createContext();
 
-    // your app here
-    var logo = new ImageSurface({
-        size: [200, 200],
-        content: 'assets/spinach.svg',
-        classes: ['double-sided']
-    });
+    var buildTeam = function(teamIcon) { 
+        // your app here
+        return new ImageSurface({
+            size: [imageWidth, imageWidth],
+            content: 'assets/'+teamIcon,
+            classes: ['double-sided']
+        });
+    }
 
     var initialTime = Date.now();
-    var centerSpinModifier = new Modifier({
-        origin: [0.5, 0.5],
-        transform : function(){
-            return Transform.rotateY(.002 * (Date.now() - initialTime));
-        }
-    });
+    var centerSpinModifier = function() {
+        return new Modifier({
+            origin: [0.5, 0.5],
+            transform : function(){
+                return Transform.rotateY(.002 * (Date.now() - initialTime));
+            }
+        })
+    };
 
-    mainContext.add(centerSpinModifier).add(logo);
+    var positionMod = function(x,y,z) {
+        return new Modifier({
+            transform : Transform.translate(x, y, z)
+        });
+    };
+
+    mainContext.add(positionMod(-imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('spinach.svg'));
+    mainContext.add(positionMod(imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('lettuce.svg'));
 });
