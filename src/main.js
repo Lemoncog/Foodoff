@@ -6,6 +6,9 @@ define(function(require, exports, module) {
     var Surface = require('famous/core/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
 
+    function simple_easing(how_much_time_has_passed) {
+        return (1 - Math.cos(how_much_time_has_passed * Math.PI)) / 2;
+    }
 
     imageWidth = 200;
 
@@ -22,11 +25,22 @@ define(function(require, exports, module) {
     }
 
     var initialTime = Date.now();
-    var centerSpinModifier = function() {
+    var centerSpinModifier = function(target) {
         return new Modifier({
             origin: [0.5, 0.5],
             transform : function(){
-                return Transform.rotateY(.002 * (Date.now() - initialTime));
+                elapsed = (Date.now() - initialTime);
+
+                dist = Math.pow(((target-elapsed)/target), 4);
+
+                //Closer to dist, slower we go!
+                if(elapsed > target) {
+                    dist = 0;
+                }
+
+                spin = (dist*40);
+                
+                return Transform.rotateY(spin);
             }
         })
     };
@@ -56,8 +70,8 @@ define(function(require, exports, module) {
 
     var vsSurface = mainContext.add(centerModifier());
 
-    vsSurface.add(positionMod(-imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('spinach.svg'));
-    vsSurface.add(positionMod(imageWidth,0,0)).add(centerSpinModifier()).add(buildTeam('lettuce.svg'));
+    vsSurface.add(positionMod(-imageWidth,0,0)).add(centerSpinModifier(10000)).add(buildTeam('spinach.svg'));
+    vsSurface.add(positionMod(imageWidth,0,0)).add(centerSpinModifier(9000)).add(buildTeam('lettuce.svg'));
 
     vsSurface.add(positionMod(0,0,0)).add(buildText('<h1>Vs</h1>'));
 });
